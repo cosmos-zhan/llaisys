@@ -16,10 +16,10 @@ void rope_(T *out, const T *in, const int64_t *pos_ids, float theta, size_t seq_
             T* dst_vec = out + offset;
 
             for (size_t j = 0; j < half_dim; ++j) {
-                double freq_exp = -2.0 * static_cast<double>(j) / static_cast<double>(head_dim);
-                double freq = std::pow(static_cast<double>(theta), freq_exp);
+                float freq_exp = -2.0f * static_cast<float>(j) / static_cast<float>(head_dim);
+                float freq = std::pow(theta, freq_exp);
                 
-                double angle = static_cast<double>(pos) * freq;
+                float angle = static_cast<float>(pos) * freq;
 
                 float cos_val = static_cast<float>(std::cos(angle));
                 float sin_val = static_cast<float>(std::sin(angle));
