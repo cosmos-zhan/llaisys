@@ -204,7 +204,7 @@ tensor_t Tensor::permute(const std::vector<size_t> &order) const {
 tensor_t Tensor::view(const std::vector<size_t> &shape) const {
     size_t numel = std::accumulate(shape.begin(), shape.end(), size_t(1), std::multiplies<size_t>());
     if(numel != this->numel()){
-        std::runtime_error("view: new shape size does not match tensor size");
+        throw std::runtime_error("view: new shape size does not match tensor size");
     }
     if (!this->isContiguous()) {
         throw std::runtime_error("view: input tensor must be contiguous. call .contiguous() first.");
