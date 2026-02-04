@@ -8,14 +8,17 @@ void rope_(T *out, const T *in, const int64_t *pos_ids, float theta, size_t seq_
     
     size_t half_dim = head_dim / 2;
     
-    std::vector<double> freqs(half_dim);
+    std::vector<double> inv_freqs(half_dim);
     for (size_t j = 0; j < half_dim; ++j) {
-        double freq_exp = -2.0 * static_cast<double>(j) / static_cast<double>(head_dim);
-        freqs[j] = std::pow(static_cast<double>(theta), freq_exp);
+        double exponent = 2.0 * static_cast<double>(j) / static_cast<double>(head_dim);
+        double denom = std::pow(static_cast<double>(theta), exponent);
+        inv_freqs[j] = 1.0 / denom;
     }
 
     for (size_t s = 0; s < seq_len; ++s) {
         int64_t pos = pos_ids[s];
+        double pos_d = static_cast<double>(pos);
+
         for (size_t h = 0; h < num_heads; ++h) {
             size_t offset = s * (num_heads * head_dim) + h * head_dim;
 
@@ -23,10 +26,15 @@ void rope_(T *out, const T *in, const int64_t *pos_ids, float theta, size_t seq_
             T* dst_vec = out + offset;
 
             for (size_t j = 0; j < half_dim; ++j) {
-                double angle = static_cast<double>(pos) * freqs[j];
 
-                float cos_val = static_cast<float>(std::cos(angle));
-                float sin_val = static_cast<float>(std::sin(angle));
+                double angle = pos_d * inv_freqs[j];
+
+                double cos_val_d = std::cos(angle);
+                double sin_val_d = std::sin(angle);
+
+
+                float cos_val = static_cast<float>(cos_val_d);
+                float sin_val = static_cast<float>(sin_val_d);
 
                 float a = llaisys::utils::cast<float>(src_vec[j]);
                 float b = llaisys::utils::cast<float>(src_vec[j + half_dim]);

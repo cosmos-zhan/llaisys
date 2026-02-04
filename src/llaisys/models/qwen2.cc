@@ -7,7 +7,6 @@ extern "C" {
 
 struct LlaisysQwen2Model *llaisysQwen2ModelCreate(const LlaisysQwen2Meta *meta, llaisysDeviceType_t device, int *device_ids, int ndevice) {
     int dev_id = (ndevice > 0 && device_ids != nullptr) ? device_ids[0] : 0;
-    // Pass by value or reference? The struct supports copy.
     Qwen2Model* model = new Qwen2Model(*meta, device, dev_id);
     return reinterpret_cast<LlaisysQwen2Model*>(model);
 }
