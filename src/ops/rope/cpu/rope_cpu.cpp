@@ -7,6 +7,13 @@ template <typename T>
 void rope_(T *out, const T *in, const int64_t *pos_ids, float theta, size_t seq_len, size_t num_heads, size_t head_dim) {
     
     size_t half_dim = head_dim / 2;
+    
+    std::vector<double> freqs(half_dim);
+    for (size_t j = 0; j < half_dim; ++j) {
+        double freq_exp = -2.0 * static_cast<double>(j) / static_cast<double>(head_dim);
+        freqs[j] = std::pow(static_cast<double>(theta), freq_exp);
+    }
+
     for (size_t s = 0; s < seq_len; ++s) {
         int64_t pos = pos_ids[s];
         for (size_t h = 0; h < num_heads; ++h) {
@@ -16,14 +23,10 @@ void rope_(T *out, const T *in, const int64_t *pos_ids, float theta, size_t seq_
             T* dst_vec = out + offset;
 
             for (size_t j = 0; j < half_dim; ++j) {
-                float freq_exp = -2.0f * static_cast<float>(j) / static_cast<float>(head_dim);
-                float freq = std::pow(theta, freq_exp);
-                
-                float angle = static_cast<float>(pos) * freq;
+                double angle = static_cast<double>(pos) * freqs[j];
 
                 float cos_val = static_cast<float>(std::cos(angle));
                 float sin_val = static_cast<float>(std::sin(angle));
-
 
                 float a = llaisys::utils::cast<float>(src_vec[j]);
                 float b = llaisys::utils::cast<float>(src_vec[j + half_dim]);
