@@ -10,6 +10,7 @@ void rope_(T *out, const T *in, const int64_t *pos_ids, float theta, size_t seq_
     
     std::vector<float> denoms(half_dim);
     for (size_t j = 0; j < half_dim; ++j) {
+        // 此处用 double 以防止 pow 计算时出现精度问题
         double exponent = (2.0 * static_cast<double>(j)) / static_cast<double>(head_dim);
         double denom_d = std::pow(static_cast<double>(theta), exponent);
         denoms[j] = static_cast<float>(denom_d);
