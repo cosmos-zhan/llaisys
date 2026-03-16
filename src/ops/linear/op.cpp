@@ -4,6 +4,7 @@
 #include "../../utils.hpp"
 
 #include "cpu/linear_cpu.hpp"
+#include "nvidia/linear_nvidia.cuh"
 
 namespace llaisys::ops {
 void linear(tensor_t out, tensor_t in, tensor_t weight, tensor_t bias) {
@@ -28,8 +29,7 @@ void linear(tensor_t out, tensor_t in, tensor_t weight, tensor_t bias) {
         return cpu::linear(out->data(), in->data(), weight->data(), bias ? bias->data() : nullptr, out->dtype(), {dimi, dimk, dimj});
 #ifdef ENABLE_NVIDIA_API
     case LLAISYS_DEVICE_NVIDIA:
-        TO_BE_IMPLEMENTED();
-        return;
+        return nvidia::linear(out->data(), in->data(), weight->data(), bias ? bias->data() : nullptr, out->dtype(), dimi, dimk, dimj);
 #endif
     default:
         EXCEPTION_UNSUPPORTED_DEVICE;

@@ -35,7 +35,7 @@ def test_sampling_smoke(model_path: str, device_name: str = "cpu") -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--device", default="cpu", choices=["cpu"], type=str)
+    parser.add_argument("--device", default="cpu", choices=["cpu", "nvidia"], type=str)
     parser.add_argument("--model", default=None, type=str)
     args = parser.parse_args()
 

@@ -286,6 +286,19 @@ class Qwen2:
             )
         )
 
+    def generate_next(
+        self,
+        inputs: Sequence[int],
+        top_k: int = 1,
+        top_p: float = 1.0,
+        temperature: float = 1.0,
+        *,
+        reset_state: bool = False,
+    ) -> int:
+        if reset_state:
+            self.reset()
+        return self._generate_next(inputs, top_k=top_k, top_p=top_p, temperature=temperature)
+
     def generate(
         self,
         inputs: Sequence[int],
@@ -304,12 +317,22 @@ class Qwen2:
         generated = []
         tokens = list(inputs)
 
-        next_token = self._generate_next(tokens, top_k=top_k, top_p=top_p, temperature=temperature)
+        next_token = self.generate_next(
+            tokens,
+            top_k=top_k,
+            top_p=top_p,
+            temperature=temperature,
+        )
         generated.append(next_token)
         tokens = [next_token]
 
         for _ in range(max_new_tokens - 1):
-            next_token = self._generate_next(tokens, top_k=top_k, top_p=top_p, temperature=temperature)
+            next_token = self.generate_next(
+                tokens,
+                top_k=top_k,
+                top_p=top_p,
+                temperature=temperature,
+            )
             generated.append(next_token)
             tokens = [next_token]
 
@@ -340,7 +363,7 @@ class Qwen2:
 
         for step in range(max_new_tokens):
             token_source = prompt_tokens if step == 0 else [generated[-1]]
-            next_token = self._generate_next(
+            next_token = self.generate_next(
                 token_source,
                 top_k=top_k,
                 top_p=top_p,

@@ -120,8 +120,12 @@ target("llaisys")
     add_deps("llaisys-tensor")
     add_deps("llaisys-ops")
     add_deps("llaisys-models")
-
-    set_languages("cxx17")
+    if has_config("nv-gpu") then
+        add_nvidia_build_settings()
+        add_nvidia_source_files()
+    else
+        set_languages("cxx17")
+    end
     set_warnings("all", "error")
     if not is_plat("windows") then
         add_ldflags("-Wl,--no-as-needed")

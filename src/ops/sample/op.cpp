@@ -4,6 +4,7 @@
 #include "../../utils.hpp"
 
 #include "cpu/sample_cpu.hpp"
+#include "nvidia/sample_nvidia.cuh"
 
 namespace llaisys::ops {
 int64_t sample(tensor_t logits, int top_k, float top_p, float temperature) {
@@ -20,8 +21,7 @@ int64_t sample(tensor_t logits, int top_k, float top_p, float temperature) {
         return cpu::sample(logits->data(), logits->dtype(), logits->numel(), top_k, top_p, temperature);
 #ifdef ENABLE_NVIDIA_API
     case LLAISYS_DEVICE_NVIDIA:
-        TO_BE_IMPLEMENTED();
-        return 0;
+        return nvidia::sample(logits->data(), logits->dtype(), logits->numel(), top_k, top_p, temperature);
 #endif
     default:
         EXCEPTION_UNSUPPORTED_DEVICE;

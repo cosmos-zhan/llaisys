@@ -302,8 +302,13 @@ int64_t Qwen2Model::infer(const int64_t* token_ids, size_t ntoken) {
     if (_device_type == LLAISYS_DEVICE_CPU) {
         return *reinterpret_cast<int64_t*>(_argmax_idx->data());
     }
-
-    return 0;
+    int64_t result = 0;
+    core::context().runtime().api()->memcpy_sync(
+        &result,
+        _argmax_idx->data(),
+        sizeof(result),
+        LLAISYS_MEMCPY_D2H);
+    return result;
 }
 
 int64_t Qwen2Model::generateNext(const int64_t* token_ids, size_t ntoken, int top_k, float top_p, float temperature) {
