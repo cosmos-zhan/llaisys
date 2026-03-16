@@ -2,18 +2,16 @@
 
 #include "../../../utils.hpp"
 
+#include <cstddef>
 #include <cstring>
 
 template <typename T>
 void embedding_(T *out, const int64_t *index, const T* weight, size_t numel, size_t embedding_dim){
-    for(size_t i = 0; i < numel; ++i){
-        // if constexpr (std::is_same_v<T, llaisys::bf16_t> || std::is_same_v<T, llaisys::fp16_t>){
-            T* out_row_dst = out + i * embedding_dim;
-            const T* weight_row_src = weight + index[i] * embedding_dim;
-            std::memcpy(out_row_dst, weight_row_src, embedding_dim * sizeof(T));
-        // } else {
-
-        // }
+#pragma omp parallel for schedule(static) if (numel >= 16)
+    for(std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(numel); ++i){
+        T* out_row_dst = out + i * embedding_dim;
+        const T* weight_row_src = weight + index[i] * embedding_dim;
+        std::memcpy(out_row_dst, weight_row_src, embedding_dim * sizeof(T));
     }
 }
 

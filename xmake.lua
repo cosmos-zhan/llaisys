@@ -123,6 +123,11 @@ target("llaisys")
 
     set_languages("cxx17")
     set_warnings("all", "error")
+    if not is_plat("windows") then
+        add_ldflags("-Wl,--no-as-needed")
+        add_syslinks("gomp")
+    end
+    add_cpu_blas_settings()
     add_files("src/llaisys/*.cc")
     set_installdir(".")
 
